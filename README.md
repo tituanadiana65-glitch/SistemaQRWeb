@@ -14,7 +14,7 @@ base de datos** `bd_equipos`.
 
 | Integrante | Historias |
 |---|---|
-| Paola Alexandra Taipe Tixilema | HU-1, HU-8 y el release v1.0 |
+| Paola Alexandra Taipe Tixilema | HU-1, HU-8 |
 | Diana Pamela Tituaña Calapiña | HU-2, HU-3 |
 | Alina Ortiz | HU-4, HU-5 |
 | Julio Zurita | HU-6, HU-7 |
