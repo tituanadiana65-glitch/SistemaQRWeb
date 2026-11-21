@@ -1,0 +1,14 @@
+# PHPJasper pesa más de 80 MB: cada integrante lo copia desde el proyecto de clase (cuartoA)
+phpjasper/
+phpjasper.zip
+
+# PDF temporales que genera el reporte
+reportes_jasper/salida/
+*.pdf
+
+# Archivos de editores y del sistema
+.vscode/
+.idea/
+nbproject/
+Thumbs.db
+desktop.ini
