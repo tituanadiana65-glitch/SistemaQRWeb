@@ -37,5 +37,26 @@
     <footer>
         Universidad Técnica de Ambato · FISEI · Software · Cuarto A
     </footer>
+    
+    <script>
+        var intentos = 0;
+
+        // Al pulsar Ingresar (o Enter) se validan los datos en el servidor
+        $('#fmLogin').on('submit', function (e) {
+            e.preventDefault();
+            $('#mensaje').text('');
+            $.post('models/login.php', $(this).serialize(), function (r) {
+                if (r.success) {
+                    location.href = 'index.php';
+                } else {
+                    intentos++;
+                    $('#clave').val('').focus();
+                    $('#mensaje').text(r.error + ' (intento ' + intentos + ')');
+                }
+            }, 'json').fail(function () {
+                $('#mensaje').text('No se pudo comunicar con el servidor. Revise que XAMPP esté encendido.');
+            });
+        });
+    </script>
 </body>
 </html>
