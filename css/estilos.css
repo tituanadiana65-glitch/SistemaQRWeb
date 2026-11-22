@@ -1,0 +1,65 @@
+/* Estilos generales del sistema */
+body {
+    background-color: #eef2f5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.encabezado {
+    background-color: #1f4e79;
+    color: white;
+    padding: 18px 0;
+    text-align: center;
+}
+.encabezado h1 {
+    font-size: 1.6rem;
+    margin: 0;
+}
+.encabezado p {
+    margin: 0;
+    opacity: 0.85;
+}
+section.contenido {
+    flex: 1;
+    background-color: white;
+    border-radius: 6px;
+    padding: 20px;
+}
+footer {
+    background-color: #1f4e79;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+}
+/* Fila seleccionada en las tablas */
+table tbody tr {
+    cursor: pointer;
+}
+/* Recuadro donde se muestra el estado de una lectura */
+.estado-lectura {
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+.estado-activo {
+    background-color: #bee5be;
+}
+.estado-baja {
+    background-color: #f5b4b4;
+}
+/* Al imprimir solo se ve la etiqueta */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #zonaImpresion, #zonaImpresion * {
+        visibility: visible;
+    }
+    #zonaImpresion {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}
