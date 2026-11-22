@@ -13,3 +13,12 @@ function aviso(texto, tipo) {
     $('#avisos').html(html);
     window.scrollTo(0, 0);
 }
+
+// Si el servidor responde 401, la sesión terminó: volver al inicio de sesión
+$(document).ajaxError(function (evento, xhr) {
+    if (xhr.status === 401) {
+        location.href = 'index.php';
+    } else {
+        aviso('No se pudo comunicar con el servidor. Revise que XAMPP esté encendido.', 'danger');
+    }
+});
