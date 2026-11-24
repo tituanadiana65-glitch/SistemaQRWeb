@@ -3,6 +3,7 @@
 
 <div id="toolbar" class="form-inline mb-2">
     <button class="btn btn-success btn-sm mr-1 mb-1" onclick="nuevoEquipo()">Nuevo equipo</button>
+    <button class="btn btn-info btn-sm mr-3 mb-1" onclick="verDetalle()">Ver detalle</button>
     <input id="txtBuscar" type="text" class="form-control form-control-sm mr-1 mb-1" placeholder="ID, nombre, tipo o ubicación" style="width:220px">
     <button class="btn btn-primary btn-sm mr-1 mb-1" onclick="buscarEquipos()">Buscar</button>
     <button class="btn btn-secondary btn-sm mr-3 mb-1" onclick="mostrarTodos()">Mostrar todos</button>
@@ -108,6 +109,22 @@
     </div>
 </div>
 
+<!-- Ventana con todos los datos del equipo -->
+<div class="modal fade" id="dlgDetalle" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalle del equipo</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body" id="detalle"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     var url;
     var filas = [];         // equipos que se muestran en la tabla
@@ -203,6 +220,36 @@
             }
         }, 'json');
     }
+
+    // Muestra todos los datos del equipo seleccionado (los trae por su ID)
+    function verDetalle() {
+        if (!seleccionado) { alert('Seleccione un equipo de la tabla'); return; }
+        $.post('models/equipos_buscar.php', { id_equipo: seleccionado.id_equipo }, function (e) {
+            if (e.error) { aviso(e.error, 'danger'); return; }
+            var html = '<table class="table table-sm">' +
+                fila('ID', e.id_equipo) + fila('Nombre', e.nombre) + fila('Tipo', e.tipo) +
+                fila('Marca', e.marca) + fila('Modelo', e.modelo) + fila('N.º de serie', e.numero_serie) +
+                fila('Ubicación', e.ubicacion) + fila('Responsable', e.responsable) +
+                fila('IP', e.direccion_ip) + fila('MAC', e.direccion_mac) +
+                fila('Sistema operativo', e.sistema_operativo) +
+                fila('Estado', e.estado === 'ACTIVO' ? 'Activo' : 'Dado de baja') +
+                (e.estado === 'ACTIVO' ? '' : fila('Fecha de baja', e.fecha_baja) + fila('Motivo', e.motivo_baja)) +
+                fila('Registrado', e.fecha_registro) + fila('Veces leído', e.veces_leido) +
+                '</table><strong>Configuración</strong><pre class="border p-2 bg-light">' + esc(e.configuracion) + '</pre>';
+            $('#detalle').html(html);
+            $('#dlgDetalle').modal('show');
+        }, 'json');
+    }
+
+    function fila(titulo, valor) {
+        return '<tr><th style="width:40%">' + titulo + '</th><td>' + esc(valor) + '</td></tr>';
+    }
+
+    // Doble clic en una fila = ver detalle
+    $('#dg tbody').on('dblclick', 'tr', function () {
+        seleccionado = filas[$(this).data('i')];
+        verDetalle();
+    });
 
     cargarTabla();
 </script>
