@@ -74,5 +74,21 @@
 
         $('#textoVistaPrevia').hide();
         $(canvas).show();
+        $('#btnDescargar, #btnImprimir').prop('disabled', false);
+    }
+
+    // Descarga la etiqueta como imagen PNG
+    function descargarPNG() {
+        if (!equipoActual) { alert('Primero genere la etiqueta'); return; }
+        var enlace = document.createElement('a');
+        enlace.download = 'QR_ID_' + equipoActual.id_equipo + '.png';
+        enlace.href = document.getElementById('etiqueta').toDataURL('image/png');
+        enlace.click();
+    }
+
+    // Imprime solo la etiqueta (ver @media print en estilos.css)
+    function imprimirEtiqueta() {
+        if (!equipoActual) { alert('Primero genere la etiqueta'); return; }
+        window.print();
     }
 </script>
