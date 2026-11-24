@@ -4,6 +4,7 @@
 <div id="toolbar" class="form-inline mb-2">
     <button class="btn btn-success btn-sm mr-1 mb-1" onclick="nuevoEquipo()">Nuevo equipo</button>
     <button class="btn btn-warning btn-sm mr-1 mb-1" onclick="editarEquipo()">Editar</button>
+    <button class="btn btn-danger btn-sm mr-1 mb-1" onclick="darDeBaja()">Dar de baja</button>
     <button class="btn btn-info btn-sm mr-3 mb-1" onclick="verDetalle()">Ver detalle</button>
     <input id="txtBuscar" type="text" class="form-control form-control-sm mr-1 mb-1" placeholder="ID, nombre, tipo o ubicación" style="width:220px">
     <button class="btn btn-primary btn-sm mr-1 mb-1" onclick="buscarEquipos()">Buscar</button>
@@ -121,6 +122,28 @@
             <div class="modal-body" id="detalle"></div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventana para dar de baja: pide el motivo -->
+<div class="modal fade" id="dlgBaja" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dar de baja</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Seguro que desea dar de baja el equipo <strong id="txtBaja"></strong>?
+                    El equipo no se borra: queda marcado como dado de baja.</p>
+                <label for="motivoBaja">Motivo *</label>
+                <input id="motivoBaja" class="form-control" maxlength="200">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="confirmarBaja()">Dar de baja</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
             </div>
         </div>
     </div>
@@ -262,6 +285,30 @@
         });
         url = 'models/equipos_actualizar.php';
         $('#dlg').modal('show');
+    }
+
+    // CRUD: Eliminar (baja lógica). Pide el motivo antes de dar de baja
+    function darDeBaja() {
+        if (!seleccionado) { alert('Seleccione un equipo de la tabla'); return; }
+        if (seleccionado.estado !== 'ACTIVO') { alert('Ese equipo ya está dado de baja'); return; }
+        $('#txtBaja').text(seleccionado.id_equipo + ' - ' + seleccionado.nombre);
+        $('#motivoBaja').val('');
+        $('#dlgBaja').modal('show');
+    }
+
+    function confirmarBaja() {
+        var motivo = $('#motivoBaja').val().trim();
+        if (motivo === '') { alert('Escriba el motivo de la baja'); return; }
+        $.post('models/equipos_baja.php', { id_equipo: seleccionado.id_equipo, motivo: motivo }, function (r) {
+            if (r.error) {
+                alert(r.error);
+            } else {
+                document.activeElement.blur();
+                $('#dlgBaja').modal('hide');
+                aviso(r.success, 'success');
+                cargarTabla();
+            }
+        }, 'json');
     }
 
     cargarTabla();
