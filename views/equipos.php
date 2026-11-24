@@ -5,6 +5,7 @@
     <button class="btn btn-success btn-sm mr-1 mb-1" onclick="nuevoEquipo()">Nuevo equipo</button>
     <button class="btn btn-warning btn-sm mr-1 mb-1" onclick="editarEquipo()">Editar</button>
     <button class="btn btn-danger btn-sm mr-1 mb-1" onclick="darDeBaja()">Dar de baja</button>
+    <button class="btn btn-outline-success btn-sm mr-1 mb-1" onclick="reactivarEquipo()">Reactivar</button>
     <button class="btn btn-info btn-sm mr-3 mb-1" onclick="verDetalle()">Ver detalle</button>
     <input id="txtBuscar" type="text" class="form-control form-control-sm mr-1 mb-1" placeholder="ID, nombre, tipo o ubicación" style="width:220px">
     <button class="btn btn-primary btn-sm mr-1 mb-1" onclick="buscarEquipos()">Buscar</button>
@@ -305,6 +306,20 @@
             } else {
                 document.activeElement.blur();
                 $('#dlgBaja').modal('hide');
+                aviso(r.success, 'success');
+                cargarTabla();
+            }
+        }, 'json');
+    }
+
+    function reactivarEquipo() {
+        if (!seleccionado) { alert('Seleccione un equipo de la tabla'); return; }
+        if (seleccionado.estado === 'ACTIVO') { alert('Ese equipo ya está activo'); return; }
+        if (!confirm('¿Reactivar el equipo ' + seleccionado.id_equipo + ' - ' + seleccionado.nombre + '?')) { return; }
+        $.post('models/equipos_reactivar.php', { id_equipo: seleccionado.id_equipo }, function (r) {
+            if (r.error) {
+                alert(r.error);
+            } else {
                 aviso(r.success, 'success');
                 cargarTabla();
             }
