@@ -3,6 +3,7 @@
 
 <div id="toolbar" class="form-inline mb-2">
     <button class="btn btn-success btn-sm mr-1 mb-1" onclick="nuevoEquipo()">Nuevo equipo</button>
+    <button class="btn btn-warning btn-sm mr-1 mb-1" onclick="editarEquipo()">Editar</button>
     <button class="btn btn-info btn-sm mr-3 mb-1" onclick="verDetalle()">Ver detalle</button>
     <input id="txtBuscar" type="text" class="form-control form-control-sm mr-1 mb-1" placeholder="ID, nombre, tipo o ubicación" style="width:220px">
     <button class="btn btn-primary btn-sm mr-1 mb-1" onclick="buscarEquipos()">Buscar</button>
@@ -250,6 +251,18 @@
         seleccionado = filas[$(this).data('i')];
         verDetalle();
     });
+
+    // CRUD: Actualizar. Abre la ventana con los datos del equipo seleccionado
+    function editarEquipo() {
+        if (!seleccionado) { alert('Seleccione un equipo de la tabla'); return; }
+        $('#dlgTitulo').text('Editar equipo con ID ' + seleccionado.id_equipo);
+        $('#fm')[0].reset();
+        $.each(seleccionado, function (campo, valor) {
+            $('#fm [name=' + campo + ']').val(valor);
+        });
+        url = 'models/equipos_actualizar.php';
+        $('#dlg').modal('show');
+    }
 
     cargarTabla();
 </script>
