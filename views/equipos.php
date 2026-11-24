@@ -159,5 +159,50 @@
     });
     $('#chkBajas').on('change', cargarTabla);
 
+    // CRUD: Crear. Abre la ventana con el formulario vacío
+    function nuevoEquipo() {
+        $('#dlgTitulo').text('Nuevo equipo');
+        $('#fm')[0].reset();
+        $('#fm [name=id_equipo]').val('');
+        url = 'models/equipos_guardar.php';
+        $('#dlg').modal('show');
+    }
+
+    // Revisa los datos antes de enviarlos (el servidor los vuelve a revisar)
+    function validarFormulario() {
+        var form = $('#fm')[0];
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
+        var ip = $('#fm [name=direccion_ip]').val().trim();
+        var mac = $('#fm [name=direccion_mac]').val().trim();
+        var regexIp = /^((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
+        var regexMac = /^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$/;
+        if (ip !== '' && !regexIp.test(ip)) {
+            alert('La dirección IP no es válida (ejemplo: 192.168.10.11)');
+            return false;
+        }
+        if (mac !== '' && !regexMac.test(mac)) {
+            alert('La dirección MAC no es válida (ejemplo: A4:BB:6D:12:34:01)');
+            return false;
+        }
+        return true;
+    }
+
+    function guardarEquipo() {
+        if (!validarFormulario()) { return; }
+        $.post(url, $('#fm').serialize(), function (r) {
+            if (r.error) {
+                alert(r.error);
+            } else {
+                document.activeElement.blur();
+                $('#dlg').modal('hide');
+                aviso(r.success, 'success');
+                cargarTabla();
+            }
+        }, 'json');
+    }
+
     cargarTabla();
 </script>
