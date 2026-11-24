@@ -27,6 +27,8 @@
 <script>
     var lector = null;      // objeto de la librería html5-qrcode que maneja la cámara
     var camaras = [];
+    var ultimoTexto = '';
+    var ultimoTiempo = 0;
 
     // Pide al navegador la lista de cámaras conectadas
     function buscarCamaras() {
@@ -59,6 +61,7 @@
             .then(function () {
                 $('#btnIniciar, #btnBuscarCamaras, #cbxCamaras').prop('disabled', true);
                 $('#btnDetener').prop('disabled', false);
+                ultimoTexto = '';
                 mostrarEstado('Cámara activa: acerque el código QR del equipo', '');
             })
             .catch(function (error) {
@@ -87,6 +90,64 @@
 
     // La librería llama a esta función cada vez que encuentra un QR en la imagen de la cámara
     function qrEncontrado(texto) {
-        mostrarEstado('QR leído: ' + texto, 'estado-activo');
+        texto = String(texto).trim();
+        // El mismo QR frente a la cámara se lee muchas veces por segundo:
+        // solo se registra de nuevo si pasaron más de 3 segundos
+        var ahora = Date.now();
+        if (texto === ultimoTexto && ahora - ultimoTiempo < 3000) { return; }
+        ultimoTexto = texto;
+        ultimoTiempo = ahora;
+        procesarQR(texto);
+    }
+
+    // Revisa que el QR tenga un ID, registra la lectura y muestra el equipo
+    function procesarQR(texto) {
+        pitido();
+        if (!/^[0-9]+$/.test(texto) || parseInt(texto, 10) <= 0) {
+            mostrarEstado('El código QR no contiene un ID válido de equipo.', 'estado-baja');
+            return;
+        }
+        $.post('models/lecturas_registrar.php', { id_equipo: texto }, function (r) {
+            if (r.error) {
+                mostrarEstado(r.error, 'estado-baja');
+                return;
+            }
+            var e = r.equipo;
+            if (e.estado === 'ACTIVO') {
+                mostrarEstado('Equipo identificado: ID ' + e.id_equipo + ' - ' + e.nombre, 'estado-activo');
+            } else {
+                mostrarEstado('ATENCIÓN: el equipo con ID ' + e.id_equipo + ' está DADO DE BAJA', 'estado-baja');
+            }
+            mostrarDatos(e);
+            var hora = new Date().toLocaleTimeString();
+            $('#listaLecturas').prepend('<li class="list-group-item py-1">' + hora + ' - ID ' + e.id_equipo + ' - ' + esc(e.nombre) + '</li>');
+        }, 'json');
+    }
+
+    function mostrarDatos(e) {
+        var html = '<table class="table table-sm">' +
+            '<tr><th>ID</th><td>' + e.id_equipo + '</td></tr>' +
+            '<tr><th>Nombre</th><td>' + esc(e.nombre) + '</td></tr>' +
+            '<tr><th>Tipo</th><td>' + esc(e.tipo) + '</td></tr>' +
+            '<tr><th>Ubicación</th><td>' + esc(e.ubicacion) + '</td></tr>' +
+            '<tr><th>Responsable</th><td>' + esc(e.responsable) + '</td></tr>' +
+            '<tr><th>IP / MAC</th><td>' + esc(e.direccion_ip) + ' / ' + esc(e.direccion_mac) + '</td></tr>' +
+            '<tr><th>Sistema operativo</th><td>' + esc(e.sistema_operativo) + '</td></tr>' +
+            '<tr><th>Veces leído</th><td>' + e.veces_leido + '</td></tr>' +
+            '</table><strong>Configuración</strong>' +
+            '<pre class="border p-2 bg-light">' + esc(e.configuracion) + '</pre>';
+        $('#datosEquipo').html(html);
+    }
+
+    // Sonido corto para avisar que se leyó un QR
+    function pitido() {
+        try {
+            var audio = new (window.AudioContext || window.webkitAudioContext)();
+            var oscilador = audio.createOscillator();
+            oscilador.frequency.value = 880;
+            oscilador.connect(audio.destination);
+            oscilador.start();
+            oscilador.stop(audio.currentTime + 0.15);
+        } catch (e) { /* sin sonido */ }
     }
 </script>
