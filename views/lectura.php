@@ -23,3 +23,70 @@
         <div id="datosEquipo"></div>
     </div>
 </div>
+
+<script>
+    var lector = null;      // objeto de la librería html5-qrcode que maneja la cámara
+    var camaras = [];
+
+    // Pide al navegador la lista de cámaras conectadas
+    function buscarCamaras() {
+        Html5Qrcode.getCameras().then(function (lista) {
+            camaras = lista;
+            $('#cbxCamaras').empty();
+            if (lista.length === 0) {
+                $('#cbxCamaras').append('<option value="">-- Sin cámaras --</option>');
+                mostrarEstado('No se encontró ninguna cámara. Revise que esté conectada.', 'estado-baja');
+                return;
+            }
+            $.each(lista, function (i, c) {
+                $('#cbxCamaras').append('<option value="' + i + '">' + esc(c.label || ('Cámara ' + (i + 1))) + '</option>');
+            });
+            // Si hay más de una, se elige la última (normalmente la USB externa)
+            $('#cbxCamaras').val(lista.length - 1);
+            mostrarEstado('Cámaras encontradas: ' + lista.length + '. Elija una y pulse Iniciar.', '');
+        }).catch(function () {
+            mostrarEstado('El navegador no dio permiso para usar la cámara.', 'estado-baja');
+        });
+    }
+
+    // Enciende la cámara elegida y empieza a buscar códigos QR
+    function iniciarCamara() {
+        var indice = $('#cbxCamaras').val();
+        if (indice === '' || indice === null) { alert('Primero busque y seleccione una cámara'); return; }
+        lector = new Html5Qrcode('lectorCamara');
+        var opciones = { fps: 5, qrbox: { width: 250, height: 250 } };
+        lector.start(camaras[indice].id, opciones, qrEncontrado, function () { /* cuadro sin QR */ })
+            .then(function () {
+                $('#btnIniciar, #btnBuscarCamaras, #cbxCamaras').prop('disabled', true);
+                $('#btnDetener').prop('disabled', false);
+                mostrarEstado('Cámara activa: acerque el código QR del equipo', '');
+            })
+            .catch(function (error) {
+                mostrarEstado('No se pudo abrir la cámara. Revise que ningún otro programa la use. ' + error, 'estado-baja');
+            });
+    }
+
+    // Apaga la cámara
+    function detenerCamara() {
+        if (lector && lector.isScanning) {
+            lector.stop().then(function () { lector.clear(); });
+        }
+        $('#btnIniciar, #btnBuscarCamaras, #cbxCamaras').prop('disabled', false);
+        $('#btnDetener').prop('disabled', true);
+        mostrarEstado('Cámara apagada', '');
+    }
+
+    // Si se sale de la página, la cámara se apaga
+    $(window).on('beforeunload', function () {
+        if (lector && lector.isScanning) { lector.stop(); }
+    });
+
+    function mostrarEstado(texto, clase) {
+        $('#estado').removeClass('estado-activo estado-baja').addClass(clase).text(texto);
+    }
+
+    // La librería llama a esta función cada vez que encuentra un QR en la imagen de la cámara
+    function qrEncontrado(texto) {
+        mostrarEstado('QR leído: ' + texto, 'estado-activo');
+    }
+</script>
