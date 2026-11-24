@@ -107,3 +107,57 @@
         </div>
     </div>
 </div>
+
+<script>
+    var url;
+    var filas = [];         // equipos que se muestran en la tabla
+    var seleccionado = null; // equipo de la fila seleccionada
+
+    // CRUD: Leer. Pide los equipos al modelo y llena la tabla
+    function cargarTabla() {
+        var datos = {
+            buscar: $('#txtBuscar').val().trim(),
+            incluir_bajas: $('#chkBajas').is(':checked') ? 1 : 0
+        };
+        $.post('models/equipos_listar.php', datos, function (data) {
+            if (data.error) { aviso(data.error, 'danger'); return; }
+            filas = data;
+            seleccionado = null;
+            var html = '';
+            $.each(data, function (i, e) {
+                var estado = e.estado === 'ACTIVO'
+                    ? '<span class="badge badge-success">Activo</span>'
+                    : '<span class="badge badge-danger">Dado de baja</span>';
+                html += '<tr data-i="' + i + '">' +
+                    '<td>' + e.id_equipo + '</td><td>' + esc(e.nombre) + '</td><td>' + esc(e.tipo) + '</td>' +
+                    '<td>' + esc(e.ubicacion) + '</td><td>' + esc(e.responsable) + '</td>' +
+                    '<td>' + esc(e.direccion_ip) + '</td><td>' + estado + '</td></tr>';
+            });
+            $('#dg tbody').html(html);
+            $('#totalEquipos').text('Equipos: ' + data.length);
+        }, 'json');
+    }
+
+    // Seleccionar una fila
+    $('#dg tbody').on('click', 'tr', function () {
+        $('#dg tbody tr').removeClass('table-primary');
+        $(this).addClass('table-primary');
+        seleccionado = filas[$(this).data('i')];
+    });
+
+    function buscarEquipos() {
+        cargarTabla();
+    }
+
+    function mostrarTodos() {
+        $('#txtBuscar').val('');
+        cargarTabla();
+    }
+
+    $('#txtBuscar').on('keypress', function (e) {
+        if (e.which === 13) { buscarEquipos(); }
+    });
+    $('#chkBajas').on('change', cargarTabla);
+
+    cargarTabla();
+</script>
