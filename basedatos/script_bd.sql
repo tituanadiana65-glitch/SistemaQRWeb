@@ -84,3 +84,21 @@ VALUES
     'FOC1234X5YZ', 'Rack Piso 2', 'Administrador de red', '192.168.99.2',
     '00:1A:2B:3C:4D:04', 'Cisco IOS 15.0',
     'VLAN de gestion: 99\nVLANs: 10, 20, 30\nVTP: Cliente\nSTP: Rapid-PVST\nTroncales: Gi0/1, Gi0/2');
+
+    
+-- ---------------------------------------------------------------------
+-- Usuarios que pueden entrar al sistema web.
+-- La clave se guarda cifrada con SHA-256 (no en texto plano).
+-- Usuario de prueba: admin / admin123
+
+
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(30) NOT NULL UNIQUE,
+    clave CHAR(64) NOT NULL,
+    nombre VARCHAR(100) NOT NULL
+);
+
+INSERT IGNORE INTO usuario (usuario, clave, nombre)
+VALUES ('admin', SHA2('admin123', 256), 'Administrador');

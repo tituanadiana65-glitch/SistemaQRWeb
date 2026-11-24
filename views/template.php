@@ -47,6 +47,8 @@
                     </div>
                 </li>
             </ul>
+                    <span class="navbar-text mr-3">Usuario: <?php echo htmlspecialchars($_SESSION['nombre']); ?></span>
+                    <a class="btn btn-outline-light btn-sm" href="models/logout.php">Cerrar sesión</a>
         </div>
     </nav>
 
