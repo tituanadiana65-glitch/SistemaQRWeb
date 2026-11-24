@@ -21,6 +21,55 @@
     <div class="col-md-6">
         <div id="estado" class="estado-lectura mb-2">Cámara apagada</div>
         <div id="datosEquipo"></div>
+        <button id="btnReporte" class="btn btn-secondary" onclick="verReporte()" style="display:none;">Ver reporte</button>
+        <button id="btnConfigurar" class="btn btn-warning" onclick="abrirConfiguracion()" style="display:none;">Editar configuración</button>
+    </div>
+</div>
+
+<!-- Ventana para editar la configuración del equipo leído -->
+<div class="modal fade" id="dlgConfig" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dlgConfigTitulo">Configurar equipo</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form id="fmConfig">
+                    <!-- Los demás datos van ocultos para que no se pierdan al guardar -->
+                    <input type="hidden" name="id_equipo">
+                    <input type="hidden" name="nombre">
+                    <input type="hidden" name="tipo">
+                    <input type="hidden" name="marca">
+                    <input type="hidden" name="modelo">
+                    <input type="hidden" name="numero_serie">
+                    <input type="hidden" name="ubicacion">
+                    <input type="hidden" name="responsable">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label>Dirección IP</label>
+                            <input name="direccion_ip" class="form-control" maxlength="15">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Dirección MAC</label>
+                            <input name="direccion_mac" class="form-control" maxlength="17">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Sistema operativo</label>
+                            <input name="sistema_operativo" class="form-control" maxlength="60">
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Configuración</label>
+                            <textarea name="configuracion" class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="guardarConfiguracion()">Guardar</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -29,6 +78,7 @@
     var camaras = [];
     var ultimoTexto = '';
     var ultimoTiempo = 0;
+    var idActual = 0;
 
     // Pide al navegador la lista de cámaras conectadas
     function buscarCamaras() {
@@ -121,6 +171,8 @@
             mostrarDatos(e);
             var hora = new Date().toLocaleTimeString();
             $('#listaLecturas').prepend('<li class="list-group-item py-1">' + hora + ' - ID ' + e.id_equipo + ' - ' + esc(e.nombre) + '</li>');
+            idActual = e.id_equipo;
+            $('#btnReporte, #btnConfigurar').show();
         }, 'json');
     }
 
@@ -149,5 +201,41 @@
             oscilador.start();
             oscilador.stop(audio.currentTime + 0.15);
         } catch (e) { /* sin sonido */ }
+    }
+
+    // Abre el reporte PDF del equipo leído
+    function verReporte() {
+        if (idActual > 0) { location.href = 'index.php?accion=reporte&id=' + idActual; }
+    }
+
+    // Trae los datos actuales del equipo y abre la ventana de configuración
+    function abrirConfiguracion() {
+        if (idActual <= 0) { return; }
+        $.post('models/equipos_buscar.php', { id_equipo: idActual }, function (e) {
+            if (e.error) { aviso(e.error, 'danger'); return; }
+            $('#fmConfig')[0].reset();
+            $.each(e, function (campo, valor) {
+                $('#fmConfig [name=' + campo + ']').val(valor);
+            });
+            $('#dlgConfigTitulo').text('Configurar equipo ' + e.id_equipo + ' - ' + e.nombre);
+            $('#dlgConfig').modal('show');
+        }, 'json');
+    }
+
+    // Guarda con el mismo modelo de Gestión de equipos (también registra el historial)
+    function guardarConfiguracion() {
+        $.post('models/equipos_actualizar.php', $('#fmConfig').serialize(), function (r) {
+            if (r.error) {
+                alert(r.error);
+                return;
+            }
+            document.activeElement.blur();
+            $('#dlgConfig').modal('hide');
+            aviso(r.success, 'success');
+            // Se muestran los datos ya actualizados
+            $.post('models/equipos_buscar.php', { id_equipo: idActual }, function (e) {
+                if (!e.error) { mostrarDatos(e); }
+            }, 'json');
+        }, 'json');
     }
 </script>
