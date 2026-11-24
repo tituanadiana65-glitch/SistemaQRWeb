@@ -90,6 +90,8 @@ VALUES
 -- Usuarios que pueden entrar al sistema web.
 -- La clave se guarda cifrada con SHA-256 (no en texto plano).
 -- Usuario de prueba: admin / admin123
+
+
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
