@@ -315,15 +315,16 @@
     function reactivarEquipo() {
         if (!seleccionado) { alert('Seleccione un equipo de la tabla'); return; }
         if (seleccionado.estado === 'ACTIVO') { alert('Ese equipo ya está activo'); return; }
-        if (!confirm('¿Reactivar el equipo ' + seleccionado.id_equipo + ' - ' + seleccionado.nombre + '?')) { return; }
-        $.post('models/equipos_reactivar.php', { id_equipo: seleccionado.id_equipo }, function (r) {
-            if (r.error) {
-                alert(r.error);
-            } else {
-                aviso(r.success, 'success');
-                cargarTabla();
-            }
-        }, 'json');
+        confirmar('¿Reactivar el equipo ' + seleccionado.id_equipo + ' - ' + seleccionado.nombre + '?', function () {
+            $.post('models/equipos_reactivar.php', { id_equipo: seleccionado.id_equipo }, function (r) {
+                if (r.error) {
+                    alert(r.error);
+                } else {
+                    aviso(r.success, 'success');
+                    cargarTabla();
+                }
+            }, 'json');
+        });
     }
 
     cargarTabla();
