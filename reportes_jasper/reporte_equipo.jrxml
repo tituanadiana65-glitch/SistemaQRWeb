@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Reporte de un equipo por su ID (HU-10). Diseñado para JasperReports 6.6.0 (JasperStarter 3.5.0).
+     Parámetro: id_equipo. Se compila a reporte_equipo.jasper con JasperStarter. -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="reporte_equipo" language="java" pageWidth="595" pageHeight="842" columnWidth="515"
+              leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40">
+
+    <!-- DejaVu Sans viene en jasperreports-fonts y se incrusta en el PDF (tildes, ñ, ·) -->
+    <style name="Base" isDefault="true" fontName="DejaVu Sans" fontSize="10"/>
+    <style name="Etiqueta" style="Base" isBold="true"/>
+
+    <parameter name="id_equipo" class="java.lang.Integer"/>
+
+    <queryString language="SQL">
+        <![CDATA[SELECT e.id_equipo, e.nombre, e.tipo, e.marca, e.modelo, e.numero_serie, e.ubicacion, e.responsable,
+       e.direccion_ip, e.direccion_mac, e.sistema_operativo, e.configuracion, e.estado,
+       e.fecha_registro, e.fecha_baja, e.motivo_baja,
+       (SELECT COUNT(*) FROM lectura_qr l WHERE l.id_equipo = e.id_equipo) AS veces_leido
+FROM equipo e
+WHERE e.id_equipo = $P{id_equipo}]]>
+    </queryString>
+
+    <field name="id_equipo" class="java.lang.Integer"/>
+    <field name="nombre" class="java.lang.String"/>
+    <field name="tipo" class="java.lang.String"/>
+    <field name="marca" class="java.lang.String"/>
+    <field name="modelo" class="java.lang.String"/>
+    <field name="numero_serie" class="java.lang.String"/>
+    <field name="ubicacion" class="java.lang.String"/>
+    <field name="responsable" class="java.lang.String"/>
+    <field name="direccion_ip" class="java.lang.String"/>
+    <field name="direccion_mac" class="java.lang.String"/>
+    <field name="sistema_operativo" class="java.lang.String"/>
+    <field name="configuracion" class="java.lang.String"/>
+    <field name="estado" class="java.lang.String"/>
+    <field name="fecha_registro" class="java.sql.Timestamp"/>
+    <field name="fecha_baja" class="java.sql.Timestamp"/>
+    <field name="motivo_baja" class="java.lang.String"/>
+    <field name="veces_leido" class="java.lang.Long"/>
+
+    <!-- Encabezado -->
+    <title>
+        <band height="80">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="16"/>
+                <textElement textAlignment="Center"><font size="10"/></textElement>
+                <text><![CDATA[Universidad Técnica de Ambato · FISEI]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="18" width="515" height="28"/>
+                <textElement textAlignment="Center"><font size="18" isBold="true"/></textElement>
+                <text><![CDATA[Reporte de equipo]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="48" width="515" height="18"/>
+                <textElement textAlignment="Center"><font size="11"/></textElement>
+                <textFieldExpression><![CDATA["Equipo con ID " + $F{id_equipo} + " - " + $F{nombre}]]></textFieldExpression>
+            </textField>
+            <line>
+                <reportElement x="0" y="72" width="515" height="1"/>
+            </line>
+        </band>
+    </title>
+
+    <!-- Datos del equipo: etiqueta (140) + valor (375). Todo flota hacia abajo si un valor ocupa varias líneas -->
+    <detail>
+        <band height="350">
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="0" width="140" height="18"/>
+                <text><![CDATA[ID:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="0" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{id_equipo}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="18" width="140" height="18"/>
+                <text><![CDATA[Nombre:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="18" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="36" width="140" height="18"/>
+                <text><![CDATA[Tipo:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="36" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{tipo}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="54" width="140" height="18"/>
+                <text><![CDATA[Marca:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="54" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{marca}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="72" width="140" height="18"/>
+                <text><![CDATA[Modelo:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="72" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{modelo}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="90" width="140" height="18"/>
+                <text><![CDATA[N.º de serie:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="90" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{numero_serie}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="108" width="140" height="18"/>
+                <text><![CDATA[Ubicación:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="108" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{ubicacion}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="126" width="140" height="18"/>
+                <text><![CDATA[Responsable:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="126" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{responsable}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="144" width="140" height="18"/>
+                <text><![CDATA[Dirección IP:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="144" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{direccion_ip}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="162" width="140" height="18"/>
+                <text><![CDATA[Dirección MAC:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="162" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{direccion_mac}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="180" width="140" height="18"/>
+                <text><![CDATA[Sistema operativo:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="180" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{sistema_operativo}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="198" width="140" height="18"/>
+                <text><![CDATA[Estado:]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="198" width="375" height="18"/>
+                <textFieldExpression><![CDATA["ACTIVO".equals($F{estado}) ? "Activo" : "Dado de baja"]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="216" width="140" height="18"/>
+                <text><![CDATA[Fecha de registro:]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="216" width="375" height="18"/>
+                <textFieldExpression><![CDATA[$F{fecha_registro}]]></textFieldExpression>
+            </textField>
+
+            <!-- Solo si el equipo está dado de baja; si no, se quita el espacio -->
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="234" width="140" height="18" isRemoveLineWhenBlank="true">
+                    <printWhenExpression><![CDATA["DADO_DE_BAJA".equals($F{estado})]]></printWhenExpression>
+                </reportElement>
+                <text><![CDATA[Fecha de baja:]]></text>
+            </staticText>
+            <textField pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="234" width="375" height="18" isRemoveLineWhenBlank="true">
+                    <printWhenExpression><![CDATA["DADO_DE_BAJA".equals($F{estado})]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{fecha_baja}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="252" width="140" height="18" isRemoveLineWhenBlank="true">
+                    <printWhenExpression><![CDATA["DADO_DE_BAJA".equals($F{estado})]]></printWhenExpression>
+                </reportElement>
+                <text><![CDATA[Motivo de baja:]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="140" y="252" width="375" height="18" isRemoveLineWhenBlank="true">
+                    <printWhenExpression><![CDATA["DADO_DE_BAJA".equals($F{estado})]]></printWhenExpression>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{motivo_baja}]]></textFieldExpression>
+            </textField>
+
+            <!-- Configuración completa: crece en varias líneas según el texto -->
+            <staticText>
+                <reportElement style="Etiqueta" positionType="Float" x="0" y="276" width="515" height="20"/>
+                <textElement><font size="12"/></textElement>
+                <text><![CDATA[Configuración]]></text>
+            </staticText>
+            <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+                <reportElement positionType="Float" x="0" y="298" width="515" height="20"/>
+                <box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+                    <pen lineWidth="0.5" lineColor="#999999"/>
+                </box>
+                <textFieldExpression><![CDATA[$F{configuracion}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement positionType="Float" x="0" y="326" width="515" height="20"/>
+                <textElement><font isBold="true"/></textElement>
+                <textFieldExpression><![CDATA["Veces que se ha leído el QR: " + $F{veces_leido}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- Pie: fecha de generación y número de página -->
+    <pageFooter>
+        <band height="24">
+            <line>
+                <reportElement x="0" y="0" width="515" height="1"/>
+            </line>
+            <textField>
+                <reportElement x="0" y="6" width="300" height="16"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Generado: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="315" y="6" width="170" height="16"/>
+                <textElement textAlignment="Right"><font size="8"/></textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="485" y="6" width="30" height="16"/>
+                <textElement><font size="8"/></textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>
