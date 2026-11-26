@@ -63,7 +63,9 @@ if ($password != "") {
 
 // 4. Se genera el PDF. Se usa el jasperstarter.bat de la carpeta win (el adaptado en clase para Java nuevo)
 try {
-    $jasper = new PHPJasper\PHPJasper($carpetaJasper . "/bin/jasperstarter/win");
+        
+    $binJasper = (strtoupper(substr(PHP_OS, 0, 3)) === "WIN") ? "/bin/jasperstarter/win" : "/bin/jasperstarter/bin";
+    $jasper = new PHPJasper\PHPJasper($carpetaJasper . $binJasper);
     $jasper->process($reporte, $salida . "/" . $nombre, [
         "format" => ["pdf"],
         "params" => ["id_equipo" => $id],
